@@ -1,0 +1,31 @@
+services:
+  # 1. The Backend API (Python/FastAPI)
+  - type: web
+    name: kitnekav2-backend
+    env: python
+    region: singapore # Optional: Choose closest to you
+    plan: free # Optional
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --timeout 120 --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: OPENAI_API_KEY
+        sync: false # You will need to enter this in dashboard
+      - key: SERPAPI_API_KEY
+        sync: false # You will need to enter this in dashboard
+      - key: FRONTEND_URL
+        value: https://kitnekav2-frontend.onrender.com
+
+  # 2. The Frontend UI (React/Vite)
+  - type: web
+    name: kitnekav2-frontend
+    env: node
+    region: singapore
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "node server.js"
+    envVars:
+      - key: VITE_API_BASE
+        value: https://kitnekav2-backend.onrender.com 
